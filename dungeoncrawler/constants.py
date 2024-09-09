@@ -1,0 +1,15 @@
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 600
+FRAME_RATE = 60
+BACKGROUND_COLOUR = (64, 64, 64)
+MOVEMENT_SPEED = 5
+IMAGE_SCALE = 3
+ANIMATION_TYPES = ['idle', 'run']
+CHARACTER_TYPES = ['big_demon', 'elf', 'goblin', 'imp', 'muddy', 'skeleton', 'tiny_zombie']
+WEAPONS = ['arrow', 'bow', 'fireball']
+WEAPON_SCALE = 1.5
+OFFSET = 10
+SHOT_COOLDOWN = 30
+SHOT_SPEED = 15
+SHOT_DISTANCE = 30
+ANIMATION_TICKS = 70
