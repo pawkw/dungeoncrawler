@@ -2,6 +2,7 @@ import pygame
 from dungeoncrawler.constants import *
 from dungeoncrawler.images import *
 from dungeoncrawler.character import Character
+from dungeoncrawler.weapon import Weapon
 
 pygame.init()
 clock = pygame.time.Clock()
@@ -24,16 +25,17 @@ for weapon in WEAPONS:
 
 player = Character(100, 100, 100, MOVEMENT_SPEED)
 player.set_images(character_images['elf'])
-run = True
 player_moving_left = False
 player_moving_right = False
 player_moving_up = False
 player_moving_down = False
+bow = Weapon(weapon_images['bow'])
 
+run = True
 while run:
     clock.tick(FRAME_RATE)
     screen.fill(BACKGROUND_COLOUR)
-    player.draw(screen)
+    
     dx = 0
     dy = 0
     for event in pygame.event.get():
@@ -66,7 +68,11 @@ while run:
     if player_moving_right:
         dx = 1
     player.move(dx, dy)
+    
     player.update()
+    player.draw(screen)
+    bow.update(player)
+    bow.draw(screen)
     pygame.display.update()
 
 pygame.quit()
