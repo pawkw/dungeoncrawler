@@ -45,7 +45,7 @@ class Weapon:
         
 class Arrow(pygame.sprite.Sprite):
     def __init__(self, image, x: int, y: int, angle: float) -> None:
-        pygame.sprite.Sprite.__init__(self)
+        super().__init__()
         self.angle = angle - 90
         self.image = pygame.transform.rotate(image, self.angle)
         self.rect = self.image.get_rect()

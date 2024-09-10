@@ -11,7 +11,7 @@ def load_images(path, use_offset):
     images = []
     images_flipped = []
     for number in range(4):
-        image = scale_image(pygame.image.load(f'{path}/{number}.png').convert_alpha(), IMAGE_SCALE)
+        image = scale_image(pygame.image.load(f'{path}{number}.png').convert_alpha(), IMAGE_SCALE)
         if use_offset:
             rect = image.get_rect()
             new_image = pygame.Surface((rect.width, rect.height-OFFSET*IMAGE_SCALE), pygame.SRCALPHA)
