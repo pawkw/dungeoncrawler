@@ -19,6 +19,7 @@ class Character:
         self.action = IDLE
         self.health = health
         self.last_update = pygame.time.get_ticks()
+        self.alive = True
 
     def set_images(self, images: list):
         self.images = images
@@ -40,9 +41,15 @@ class Character:
         self.rect.x += dx
         self.rect.y += dy
 
+    def take_hit(self, damage: int):
+        self.health -= damage
+        if self.health <= 0:
+            self.alive = False
+        print(self.health)
+
     def update(self):
         current_time = pygame.time.get_ticks()
-        if current_time - self.last_update > ANIMATION_TICKS:
+        if current_time - self.last_update > ANIMATION_TICKS and self.alive:
             self.frame_index = (self.frame_index + 1) & 3
             self.last_update = current_time
 

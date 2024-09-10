@@ -29,8 +29,15 @@ player_moving_left = False
 player_moving_right = False
 player_moving_up = False
 player_moving_down = False
+
 bow = Weapon(weapon_images['bow'], weapon_images['arrow'])
 arrow_group = pygame.sprite.Group()
+
+mob_list = []
+enemy = Character(200, 300, 30, MOVEMENT_SPEED)
+enemy.set_images(character_images['imp'])
+mob_list.append(enemy)
+
 run = True
 while run:
     clock.tick(FRAME_RATE)
@@ -73,10 +80,14 @@ while run:
     arrow = bow.update(player)
     if arrow:
         arrow_group.add(arrow)
-    arrow_group.update()
+    arrow_group.update(mob_list)
+    for mob in mob_list:
+        mob.update()
 
     player.draw(screen)
     bow.draw(screen)
+    for mob in mob_list:
+        mob.draw(screen)
     arrow_group.draw(screen)
 
     pygame.display.update()
