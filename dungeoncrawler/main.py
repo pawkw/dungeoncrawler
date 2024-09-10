@@ -29,8 +29,8 @@ player_moving_left = False
 player_moving_right = False
 player_moving_up = False
 player_moving_down = False
-bow = Weapon(weapon_images['bow'])
-
+bow = Weapon(weapon_images['bow'], weapon_images['arrow'])
+arrow_group = pygame.sprite.Group()
 run = True
 while run:
     clock.tick(FRAME_RATE)
@@ -68,11 +68,17 @@ while run:
     if player_moving_right:
         dx = 1
     player.move(dx, dy)
-    
+
     player.update()
+    arrow = bow.update(player)
+    if arrow:
+        arrow_group.add(arrow)
+    arrow_group.update()
+
     player.draw(screen)
-    bow.update(player)
     bow.draw(screen)
+    arrow_group.draw(screen)
+
     pygame.display.update()
 
 pygame.quit()
