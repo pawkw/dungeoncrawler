@@ -12,7 +12,7 @@ class Character:
         self.animation_list = animation_list
         self.image = animation_list[0]
         self.flip = 0
-        self.rect = pygame.Rect(0, 0, 40, 40)
+        self.rect = pygame.Rect(0, 0, TILE_SIZE, TILE_SIZE)
         self.rect.center = (x, y)
         self.frame_index = 0
         self.speed = speed
