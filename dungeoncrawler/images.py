@@ -21,5 +21,12 @@ def load_images(path, use_offset):
         images_flipped.append(pygame.transform.flip(images[-1], True, False))
     return [images, images_flipped]
 
+def load_tiles(path):
+    images = []
+    for number in range(18):
+        image = scale_image(pygame.image.load(f'{path}{number}.png').convert_alpha(), IMAGE_SCALE)
+        images.append(image)
+    return images
+
 def load_image(path):
     return pygame.image.load(path+'.png').convert_alpha()

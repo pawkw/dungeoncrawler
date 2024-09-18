@@ -1,10 +1,12 @@
 import pygame
+import csv
 from pygame.sprite import Group
 from dungeoncrawler.constants import *
 from dungeoncrawler.images import *
 from dungeoncrawler.character import Character
 from dungeoncrawler.weapon import Weapon
 from dungeoncrawler.items import Item
+from dungeoncrawler.world import World
 
 pygame.init()
 clock = pygame.time.Clock()
@@ -95,6 +97,20 @@ mob_list = []
 enemy = Character(200, 300, 300, MOVEMENT_SPEED, character_images['imp'])
 mob_list.append(enemy)
 
+world_data = [
+    [7,7,7,7,7],
+    [7,0,1,2,7],
+    [7,3,4,5,7],
+    [7,6,6,6,7],
+    [7,7,7,7,7],
+]
+
+tile_images = load_tiles('dungeoncrawler/assets/images/tiles/')
+
+world = World()
+world.process_data(world_data, tile_images)
+
+
 run = True
 while run:
     clock.tick(FRAME_RATE)
@@ -152,6 +168,7 @@ while run:
     item_group.update(player)
     score_coin.update(None)
 
+    world.draw(screen)
     player.draw(screen)
     bow.draw(screen)
     item_group.draw(screen)
