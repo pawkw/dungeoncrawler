@@ -14,7 +14,7 @@ def load_images(path, use_offset):
         image = scale_image(pygame.image.load(f'{path}{number}.png').convert_alpha(), IMAGE_SCALE)
         if use_offset:
             rect = image.get_rect()
-            new_image = pygame.Surface((rect.width, rect.height-OFFSET*IMAGE_SCALE), pygame.SRCALPHA)
+            new_image = pygame.Surface((ITEM_SIZE, ITEM_SIZE+10), pygame.SRCALPHA)
             new_image.blit(image, (0,0), (0, OFFSET*IMAGE_SCALE, rect.width, rect.height))
             image = new_image
         images.append(image)
@@ -24,7 +24,7 @@ def load_images(path, use_offset):
 def load_tiles(path):
     images = []
     for number in range(18):
-        image = scale_image(pygame.image.load(f'{path}{number}.png').convert_alpha(), IMAGE_SCALE)
+        image = pygame.transform.scale(pygame.image.load(f'{path}{number}.png').convert_alpha(), (TILE_SIZE, TILE_SIZE))
         images.append(image)
     return images
 

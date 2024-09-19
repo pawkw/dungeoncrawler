@@ -67,6 +67,12 @@ class World:
         absolute_rect.left += self.screen_rect.left
         absolute_rect.top += self.screen_rect.top
         return absolute_rect
+    
+    def check_obstacle_collsions(self, item_rect: pygame.rect.Rect):
+        for obstacle in self.obstacle_tiles:
+            if item_rect.colliderect(obstacle.rect):
+                return obstacle
+        return None
 
     def update(self, player):
         if player.rect.left < self.screen_rect.left + SCROLL_THRESHOLD:

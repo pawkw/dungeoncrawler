@@ -8,7 +8,7 @@ from dungeoncrawler.items import Item
 from dungeoncrawler.world import World
 
 pygame.init()
-level = 3
+level = 1
 clock = pygame.time.Clock()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption('Dungeon Crawler')
@@ -120,7 +120,8 @@ player = Character(world.player.rect.x, world.player.rect.y, 100, MOVEMENT_SPEED
 mob_list = []
 mob_index = ['imp', 'skeleton', 'goblin', 'muddy', 'tiny_zombie', 'big_demon']
 for mob in world.mobs:
-    new_mob = Character(mob.rect.centerx, mob.rect.centery, 100, 5, character_images[mob_index[mob.tile_type-12]])
+    name = mob_index[mob.tile_type-12]
+    new_mob = Character(mob.rect.centerx, mob.rect.centery, (mob.tile_type-11)*12, MOB_SPEED, character_images[name], name=='big_demon')
     mob_list.append(new_mob)
 
 run = True
@@ -159,7 +160,7 @@ while run:
         dx = -1
     if player_moving_right:
         dx = 1
-    player.move(dx, dy)
+    player.move(dx, dy, world)
 
     damage = player.update()
     arrow = bow.update(player, world)
@@ -169,8 +170,9 @@ while run:
             damage_text_group.add(damage_text)
     if arrow:
         arrow_group.add(arrow)
-    arrow_group.update(mob_list)
+    arrow_group.update(mob_list, world)
     for mob in mob_list:
+        mob.AI(player, mob_list, world)
         damage = mob.update()
         if damage != 0:
             damage = -damage
@@ -195,5 +197,8 @@ while run:
     draw_info()
     score_coin.draw_fixed(screen)
     pygame.display.update()
+    if not player.alive:
+        run = False
+
 
 pygame.quit()

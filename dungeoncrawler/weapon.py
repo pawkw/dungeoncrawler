@@ -4,6 +4,7 @@ from pygame.sprite import Group
 from dungeoncrawler.character import Character
 import math
 from dungeoncrawler.constants import *
+from dungeoncrawler.world import World
 import random
 
 class Weapon:
@@ -59,12 +60,12 @@ class Arrow(pygame.sprite.Sprite):
         self.dy = -math.sin(math.radians(self.angle + 90)) * SHOT_SPEED
         self.distance = SHOT_DISTANCE
 
-    def update(self, mob_list) -> None:
+    def update(self, mob_list, world: World) -> None:
         self.rect.x += self.dx
         self.rect.y += self.dy
         self.distance -= 1
 
-        if self.distance <= 0:
+        if self.distance <= 0 or world.check_obstacle_collsions(self.rect):
             self.kill()
 
         for mob in mob_list:
