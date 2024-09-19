@@ -16,12 +16,13 @@ class Weapon:
         self.last_fired = 0
         self.fired = False
 
-    def update(self, character: Character):
+    def update(self, character: Character, world):
         self.rect.center = character.rect.center
 
         pos = pygame.mouse.get_pos()
-        dx = pos[0] - self.rect.centerx
-        dy = -(pos[1] - self.rect.centery)
+        screen_position = world.get_screen_position(self.rect)
+        dx = pos[0] - screen_position.centerx
+        dy = -(pos[1] - screen_position.centery)
         self.angle = math.degrees(math.atan2(dy, dx))
 
         arrow = None
@@ -35,13 +36,17 @@ class Weapon:
             self.fired = False
 
         return arrow
+        
+    def draw(self, surface: pygame.surface.Surface, world):
+        if self.rect.colliderect(world.screen_rect):
+            self.image = pygame.transform.rotate(self.original_image, self.angle)
+            blit_rect = pygame.rect.Rect(self.rect)
+            blit_rect.centerx = self.rect.centerx - world.screen_rect.left
+            blit_rect.centery = self.rect.centery - world.screen_rect.top
 
-    def draw(self, surface):
-        self.image = pygame.transform.rotate(self.original_image, self.angle)
-        surface.blit(self.image, 
-                    ((self.rect.centerx - int(self.image.get_width() >> 1),
-                      self.rect.centery - int(self.image.get_height() >> 1)))
-                      )
+            surface.blit(self.image, ((blit_rect.centerx - int(self.image.get_width() >> 1),
+                                       blit_rect.centery - int(self.image.get_height() >> 1)))
+                    )
         
 class Arrow(pygame.sprite.Sprite):
     def __init__(self, image, x: int, y: int, angle: float) -> None:
@@ -69,8 +74,13 @@ class Arrow(pygame.sprite.Sprite):
                 self.kill()
                 break
 
-    def draw(self, surface):
-        surface.blit(self.image, 
-                    ((self.rect.centerx - int(self.image.get_width() >> 1),
-                      self.rect.centery - int(self.image.get_height() >> 1)))
+    def draw(self, surface, world):
+        if self.rect.colliderect(world.screen_rect):
+            blit_rect = pygame.rect.Rect(self.rect)
+            blit_rect.centerx = self.rect.centerx - world.screen_rect.left
+            blit_rect.centery = self.rect.centery - world.screen_rect.top
+            
+            surface.blit(self.image, 
+                    ((blit_rect.centerx - int(self.image.get_width() >> 1),
+                      blit_rect.centery - int(self.image.get_height() >> 1)))
                       )

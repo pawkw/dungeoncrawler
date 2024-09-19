@@ -64,6 +64,11 @@ class Character:
             self.last_update = current_time
         return result
 
-    def draw(self, surface):
-        surface.blit(self.image, self.rect)
-        pygame.draw.rect(surface, pygame.Color('red'), self.rect, 1)
+    #def draw(self, surface):
+        # surface.blit(self.image, self.rect)
+        # pygame.draw.rect(surface, pygame.Color('red'), self.rect, 1)
+
+    def draw(self, surface: pygame.surface.Surface, world):
+        if self.rect.colliderect(world.screen_rect):
+            blit_rect = world.get_screen_position(self.rect)
+            surface.blit(self.image, blit_rect)

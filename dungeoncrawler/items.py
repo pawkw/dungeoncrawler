@@ -2,6 +2,7 @@ import pygame
 from pygame.sprite import Group
 from dungeoncrawler.constants import *
 from dungeoncrawler.character import Character
+from dungeoncrawler.world import World
 
 class Item(pygame.sprite.Sprite):
     def __init__(self, x: int, y: int, item_type: int, animation_list) -> None:
@@ -29,5 +30,13 @@ class Item(pygame.sprite.Sprite):
                 pass
             self.kill()
 
-    def draw(self, surface: pygame.surface.Surface):
+    def draw(self, surface: pygame.surface.Surface, world):
+        if self.rect.colliderect(world.screen_rect):
+            blit_rect = pygame.rect.Rect(self.rect)
+            blit_rect.centerx = self.rect.centerx - world.screen_rect.left
+            blit_rect.centery = self.rect.centery - world.screen_rect.top
+
+            surface.blit(self.image, blit_rect)
+
+    def draw_fixed(self, surface):
         surface.blit(self.image, self.rect)

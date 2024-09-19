@@ -9,6 +9,7 @@ from dungeoncrawler.items import Item
 from dungeoncrawler.world import World
 
 pygame.init()
+level = 1
 clock = pygame.time.Clock()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption('Dungeon Crawler')
@@ -19,7 +20,8 @@ class DamageText(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         self.image = font.render(str(damage), True, colour)
         self.rect = self.image.get_rect()
-        self.rect.center = (x, y)
+        self.rect.centerx = x
+        self.rect.centery = y
         self.start_time = pygame.time.get_ticks()
 
     def update(self):
@@ -27,8 +29,10 @@ class DamageText(pygame.sprite.Sprite):
         if pygame.time.get_ticks() - self.start_time > TEXT_TICKS:
             self.kill()
 
-    def draw(self, surface):
-        surface.blit(self.image, self.rect)
+    def draw(self, surface, world):
+        if self.rect.colliderect(world.screen_rect):
+            blit_rect = world.get_screen_position(self.rect)
+            surface.blit(self.image, blit_rect)
 
 heart_empty = scale_image(load_image('dungeoncrawler/assets/images/items/heart_empty'), ITEM_SCALE)
 heart_half = scale_image(load_image('dungeoncrawler/assets/images/items/heart_half'), ITEM_SCALE)
@@ -97,13 +101,11 @@ mob_list = []
 enemy = Character(200, 300, 300, MOVEMENT_SPEED, character_images['imp'])
 mob_list.append(enemy)
 
-world_data = [
-    [7,7,7,7,7],
-    [7,0,1,2,7],
-    [7,3,4,5,7],
-    [7,6,6,6,7],
-    [7,7,7,7,7],
-]
+# world_data = [[-1] * LEVEL_COLS] * LEVEL_ROWS
+
+with open(f"dungeoncrawler/levels/level{level}_data.csv", 'r', newline="") as level_file:
+            data = level_file.readlines()
+            world_data = [[int(number) for number in line.split(',')] for line in data]
 
 tile_images = load_tiles('dungeoncrawler/assets/images/tiles/')
 
@@ -150,7 +152,7 @@ while run:
     player.move(dx, dy)
 
     damage = player.update()
-    arrow = bow.update(player)
+    arrow = bow.update(player, world)
     if damage != 0:
             damage = -damage
             damage_text = DamageText(player.rect.centerx, player.rect.y, damage, pygame.Color('green') if damage > 0 else pygame.Color('red'))
@@ -162,22 +164,26 @@ while run:
         damage = mob.update()
         if damage != 0:
             damage = -damage
-            damage_text = DamageText(mob.rect.centerx, mob.rect.y, damage, pygame.Color('green') if damage > 0 else pygame.Color('red'))
+            damage_text = DamageText(mob.rect.centerx, mob.rect.top, damage, pygame.Color('green') if damage > 0 else pygame.Color('red'))
             damage_text_group.add(damage_text)
     damage_text_group.update()
     item_group.update(player)
     score_coin.update(None)
+    world.update(player)
 
     world.draw(screen)
-    player.draw(screen)
-    bow.draw(screen)
-    item_group.draw(screen)
+    player.draw(screen, world)
+    bow.draw(screen, world)
+    for item in item_group:
+        item.draw(screen, world)
     for mob in mob_list:
-        mob.draw(screen)
-    arrow_group.draw(screen)
-    damage_text_group.draw(screen)
+        mob.draw(screen, world)
+    for current_arrow in arrow_group:
+        current_arrow.draw(screen, world)
+    for damage in damage_text_group:
+        damage.draw(screen, world)
     draw_info()
-    score_coin.draw(screen)
+    score_coin.draw_fixed(screen)
     pygame.display.update()
 
 pygame.quit()
