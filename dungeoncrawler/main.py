@@ -1,5 +1,4 @@
 import pygame
-import csv
 from pygame.sprite import Group
 from dungeoncrawler.constants import *
 from dungeoncrawler.images import *
@@ -9,7 +8,7 @@ from dungeoncrawler.items import Item
 from dungeoncrawler.world import World
 
 pygame.init()
-level = 1
+level = 3
 clock = pygame.time.Clock()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption('Dungeon Crawler')
@@ -39,11 +38,12 @@ heart_half = scale_image(load_image('dungeoncrawler/assets/images/items/heart_ha
 heart_full = scale_image(load_image('dungeoncrawler/assets/images/items/heart_full'), ITEM_SCALE)
 coin_images = []
 for index in range(4):
-    image = scale_image(load_image(f'dungeoncrawler/assets/images/items/coin_f{index}'), COIN_SCALE)
+    image = scale_image(load_image(f'dungeoncrawler/assets/images/items/coin_f{index}'), ITEM_SCALE)
     coin_images.append(image)
 potion_image = [scale_image(load_image('dungeoncrawler/assets/images/items/potion_red'), ITEM_SCALE)]
 
 current_score = -1
+current_level = -1
 coin_width = coin_images[0].get_width()
 screen_mid = SCREEN_WIDTH >> 1
 def draw_info():
@@ -59,11 +59,18 @@ def draw_info():
             screen.blit(heart_empty, (10+i*50, 0))
         current -= 20
 
+    if current_level != level:
+        level_text = font.render(f'-=[{level}]=-', True, pygame.Color('blue'))
+        level_rect = level_text.get_rect()
+        level_rect.centery = 25
+        level_rect.centerx = screen_mid
+    screen.blit(level_text, level_rect)
+
     if current_score != player.score:
         score_text = font.render(f':{player.score}', True, pygame.Color('blue'))
         score_rect = score_text.get_rect()
         score_rect.centery = 25
-        score_rect.x = screen_mid + coin_width
+        score_rect.x = SCREEN_WIDTH - 80
     screen.blit(score_text, score_rect)
 
 character_images = {}
@@ -80,26 +87,16 @@ weapon_images = {}
 for weapon in WEAPONS:
     weapon_images[weapon] = scale_image(load_image(f'dungeoncrawler/assets/images/weapons/{weapon}'), WEAPON_SCALE)
 
-player = Character(100, 100, 100, MOVEMENT_SPEED, character_images['elf'])
 player_moving_left = False
 player_moving_right = False
 player_moving_up = False
 player_moving_down = False
-player.take_hit(25)
 
 bow = Weapon(weapon_images['bow'], weapon_images['arrow'])
 arrow_group = pygame.sprite.Group()
 damage_text_group = pygame.sprite.Group()
-potion = Item(200, 200, ITEM_POTION, potion_image)
-coin = Item(250, 200, ITEM_COIN, coin_images)
-score_coin = Item(screen_mid + (coin_width >> 1), 25, ITEM_COIN, coin_images)
+score_coin = Item(SCREEN_WIDTH - 80 - coin_width, 25, ITEM_COIN, coin_images)
 item_group = pygame.sprite.Group()
-item_group.add(potion)
-item_group.add(coin)
-
-mob_list = []
-enemy = Character(200, 300, 300, MOVEMENT_SPEED, character_images['imp'])
-mob_list.append(enemy)
 
 # world_data = [[-1] * LEVEL_COLS] * LEVEL_ROWS
 
@@ -111,7 +108,20 @@ tile_images = load_tiles('dungeoncrawler/assets/images/tiles/')
 
 world = World()
 world.process_data(world_data, tile_images)
-
+for item in world.items:
+    new_item = None
+    if item.tile_type == 9:
+        new_item = Item(item.rect.centerx, item.rect.centery, ITEM_COIN, coin_images)
+    elif item.tile_type == 10:
+        new_item = Item(item.rect.x, item.rect.y, ITEM_POTION, potion_image)
+    if new_item:
+        item_group.add(new_item)
+player = Character(world.player.rect.x, world.player.rect.y, 100, MOVEMENT_SPEED, character_images['elf'])
+mob_list = []
+mob_index = ['imp', 'skeleton', 'goblin', 'muddy', 'tiny_zombie', 'big_demon']
+for mob in world.mobs:
+    new_mob = Character(mob.rect.centerx, mob.rect.centery, 100, 5, character_images[mob_index[mob.tile_type-12]])
+    mob_list.append(new_mob)
 
 run = True
 while run:
